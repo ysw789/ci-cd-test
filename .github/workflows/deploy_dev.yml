@@ -61,5 +61,6 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             docker stop ci-cd-test-dev
+            docker rm ci-cd-test-dev
             docker run -d -p 9090:9090 --name ci-cd-test-dev ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             exit

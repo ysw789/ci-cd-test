@@ -26,3 +26,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+test {
+    systemProperty 'my-first-secret', System.getenv('MY_FIRST_SECRET')
+    environment 'MY_FIRST_SECRET', System.getenv('MY_FIRST_SECRET')
+}

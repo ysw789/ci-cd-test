@@ -75,7 +75,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd ~/cicdtest
-            scp -o StrictHostKeyChecking=no ../.env .env
+            scp -o StrictHostKeyChecking=no ./.env .env
             docker pull ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             docker stop ci-cd-test-dev
             docker rm ci-cd-test-dev

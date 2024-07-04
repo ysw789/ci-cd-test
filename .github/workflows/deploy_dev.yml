@@ -18,31 +18,31 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli jq
-
-      - name: Configure AWS CLI
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
-          aws configure set default.region ${{ secrets.AWS_REGION }}
-
-      - name: Fetch secrets from AWS Secrets Manager
-        run: |
-          aws secretsmanager get-secret-value --secret-id ${{ secrets.AWS_SECRET_NAME }} --query 'SecretString' --output text | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > .env
-          ls -al
-          pwd
+#      - name: Install AWS CLI
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y awscli jq
+#
+#      - name: Configure AWS CLI
+#        run: |
+#          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
+#          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
+#          aws configure set default.region ${{ secrets.AWS_REGION }}
+#
+#      - name: Fetch secrets from AWS Secrets Manager
+#        run: |
+#          aws secretsmanager get-secret-value --secret-id ${{ secrets.AWS_SECRET_NAME }} --query 'SecretString' --output text | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > .env
+#          ls -al
+#          pwd
 
       #      - name: Set up properties file
       #        run: echo "${{ secrets.DEV_PROPERTIES }}" > src/main/resources/application-dev.properties
 
-      - name: Upload .env file as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: env-file
-          path: .env
+#      - name: Upload .env file as artifact
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: env-file
+#          path: .env
 
       - name: Build with Gradle
         run: ./gradlew build
@@ -74,11 +74,11 @@ jobs:
     needs: build
 
     steps:
-      - name: Download .env file
-        uses: actions/download-artifact@v2
-        with:
-          name: env-file
-          path: .env
+#      - name: Download .env file
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: env-file
+#          path: .env
 
       - name: SSH to Server and Deploy
         uses: appleboy/ssh-action@master
@@ -89,8 +89,10 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd ~/cicdtest
+            aws secretsmanager get-secret-value --secret-id ${{ secrets.AWS_SECRET_NAME }} --query 'SecretString' --output text | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > .env
+            cat .env
             docker pull ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             docker stop ci-cd-test-dev
             docker rm ci-cd-test-dev
-            docker run -d -p 9090:9090 --name ci-cd-test-dev --env-file ./.env ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
+            docker run -d -p 9090:9090 --name ci-cd-test-dev --env-file .env ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             exit

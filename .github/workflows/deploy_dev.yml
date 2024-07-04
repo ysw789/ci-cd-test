@@ -18,8 +18,23 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
-      - name: Set up properties file
-        run: echo "${{ secrets.DEV_PROPERTIES }}" > src/main/resources/application-dev.properties
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli jq
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_KEY }}
+          aws configure set default.region ${{ secrets.AWS_REGION }}
+
+      - name: Fetch secrets from AWS Secrets Manager
+        run: |
+          aws secretsmanager get-secret-value --secret-id ${{ secrets.AWS_SECRET_NAME }} --query 'SecretString' --output text | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > .env
+
+#      - name: Set up properties file
+#        run: echo "${{ secrets.DEV_PROPERTIES }}" > src/main/resources/application-dev.properties
 
       - name: Build with Gradle
         run: ./gradlew build
@@ -59,8 +74,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
+            cd ~/cicdtest
+            scp -o StrictHostKeyChecking=no ../.env .env
             docker pull ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             docker stop ci-cd-test-dev
             docker rm ci-cd-test-dev
-            docker run -d -p 9090:9090 --name ci-cd-test-dev ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
+            docker run -d -p 9090:9090 --name ci-cd-test-dev --env-file .env ${{ secrets.DOCKER_USERNAME }}/ci-cd-test-dev:latest
             exit

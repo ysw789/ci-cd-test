@@ -13,11 +13,11 @@ public class CiCdTestApplication {
         SpringApplication.run(CiCdTestApplication.class, args);
     }
 
-    @Bean
-    ApplicationRunner applicationRunner(@Value("${my-first-secret}") String myFirstSecret) {
-        return args -> {
-            System.out.println("ASM inject test: " + myFirstSecret);
-        };
-    }
+//    @Bean
+//    ApplicationRunner applicationRunner(@Value("${my-first-secret}") String myFirstSecret) {
+//        return args -> {
+//            System.out.println("ASM inject test: " + myFirstSecret);
+//        };
+//    }
 
 }

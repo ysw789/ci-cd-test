@@ -32,6 +32,7 @@ jobs:
       - name: Fetch secrets from AWS Secrets Manager
         run: |
           aws secretsmanager get-secret-value --secret-id ${{ secrets.AWS_SECRET_NAME }} --query 'SecretString' --output text | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > .env
+          cat .env
 
       #      - name: Set up properties file
       #        run: echo "${{ secrets.DEV_PROPERTIES }}" > src/main/resources/application-dev.properties

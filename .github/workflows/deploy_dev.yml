@@ -1,9 +1,9 @@
 name: Build and Push Docker Image - dev
 
-on:
-  push:
-    branches:
-      - develop
+#on:
+#  push:
+#    branches:
+#      - develop
 
 jobs:
   build:

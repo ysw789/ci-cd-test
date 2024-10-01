@@ -51,14 +51,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           port: ${{ secrets.SERVER_PORT }}
           username: ${{ secrets.SERVER_USER }}
-          # password: ${{ secrets.SERVER_PASSWORD }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
-#            cd ~/cicdtest
-#            aws secretsmanager get-secret-value --secret-id ${{ secrets.AWS_SECRET_NAME }} --query 'SecretString' --output text | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > .env
-#            echo "${{ secrets.env }}" > .env
             docker pull ${{ secrets.DOCKER_USERNAME }}/ci-cd-test:latest
             docker stop ci-cd-test && docker rm ci-cd-test
-#            docker run -d -p 9090:9090 --name ci-cd-test --env-file .env ${{ secrets.DOCKER_USERNAME }}/ci-cd-test:latest
             docker run -d -p 9000:9000 --name ci-cd-test ${{ secrets.DOCKER_USERNAME }}/ci-cd-test:latest        
             docker images prune -f

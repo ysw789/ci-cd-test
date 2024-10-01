@@ -19,8 +19,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4'
+    implementation 'com.amazonaws:aws-java-sdk-secretsmanager:1.12.751'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    systemProperty 'my-first-secret', System.getenv('MY_FIRST_SECRET')
+    environment 'MY_FIRST_SECRET', System.getenv('MY_FIRST_SECRET')
 }

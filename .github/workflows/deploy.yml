@@ -18,7 +18,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Properties file
-        run: echo "${{ secrets.PROPERTIES }}" > src/main/resources/application.properties
+        run: echo "${{ secrets.PROPERTIES }}" > src/main/resources/application.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -56,4 +56,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/ci-cd-test:latest
             docker stop ci-cd-test && docker rm ci-cd-test
             docker run -d -p 9000:9000 --name ci-cd-test ${{ secrets.DOCKER_USERNAME }}/ci-cd-test:latest        
-            docker images prune -f
+            docker image prune -f
